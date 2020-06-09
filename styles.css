@@ -1,23 +1,28 @@
 .main_container_studtimetable {
-	overflow: auto;
+    overflow: auto;
 }
+
 .studtimetable {
-	min-width: 900px;
+    min-width: 900px;
 }
+
 .studtimetable .table {
-	display: table;
-	width: 100%;
-	table-layout: fixed
+    display: table;
+    width: 100%;
+    table-layout: fixed
 }
+
 .studtimetable .table .row {
-	display: table-row;
-	text-align: center;
+    display: table-row;
+    text-align: center;
 }
+
 .studtimetable .table .cell {
-	display: table-cell;
-	width: 100%;
-	word-wrap: break-word;
+    display: table-cell;
+    width: 100%;
+    word-wrap: break-word;
 }
+
 .studtimetable .ttdate {
     display: inline-block;
     text-align: center;
@@ -27,18 +32,21 @@
     padding: 5px;
     font-weight: bold;
     background-color: #eceeef;
-	font-size: 18px;
+    font-size: 18px;
 }
+
 .studtimetable .table .cell {
-	border-top: 1px solid #f4f4f4;
-	border-bottom: 1px solid #f4f4f4;
-	padding: 5px;
-	vertical-align: middle;
+    border-top: 1px solid #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
+    padding: 5px;
+    vertical-align: middle;
 }
+
 .studtimetable .table .head .cell {
-	font-weight: bold;
-	padding: 5px;
+    font-weight: bold;
+    padding: 5px;
 }
+
 .studtimetable .table .row:nth-of-type(even) {
     background-color: #fafafa;
 }
