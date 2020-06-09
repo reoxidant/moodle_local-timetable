@@ -34,36 +34,11 @@ $event = \local_student_timetable\event\student_timetable_viewed::create(array(
 
 $event->trigger();
 
-$curdaystart = (int)mktime(0, 0, 0, 1, 1, 2020);
+$curdaystart = (int)mktime(0, 0, 0);
 
 // удалим старые записи
 @$DB->execute("DELETE FROM sirius_studtimetable WHERE markdelete != 0");
 @$DB->execute("DELETE FROM sirius_studtimetable_elen WHERE markdelete != 0");
-
-/*$sqltext = "SELECT
-stt.uid, stt.date,
-toc.timestart, toc.timeend,
-cr.name AS class,
-g.name AS group,
-e.name AS eventtype,
-concat(u.lastname, ' ', u.firstname) AS teachername,
-u.id AS tutorid, dis.name AS discipline,
-sd.name AS department
-FROM sirius_studtimetable stt
-JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0 AND sg.username::varchar = ?
-JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
-JOIN sirius_groups g ON stt.groupuid = g.uid
-JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
-LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
-LEFT JOIN {user} u ON stf.username = u.username
-JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
-LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
-JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
-WHERE stt.markdelete = 0 AND stt.date >= ?
-ORDER BY stt.date, toc.timestart";*/
-
-
-//$dbresult = $DB->get_records_sql($sqltext, array($USER->username, $curdaystart));
 
 $sqltext = "SELECT 
 stt.uid, stt.date,
@@ -72,7 +47,6 @@ cr.name AS class,
 g.name AS group,
 e.name AS eventtype,
 sg.username AS username,
-concat(u.lastname, ' ', u.firstname) AS teachername,
 u.id AS tutorid, dis.name AS discipline,
 sd.name AS department
 FROM sirius_studtimetable stt
@@ -88,23 +62,7 @@ JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
 WHERE stt.markdelete = 0 AND stt.date >= ? AND u.username::varchar = ?
 ORDER BY stt.date, toc.timestart";
 
-$dbresult = $DB->get_records_sql($sqltext, array($curdaystart, "b.nikolaev"));
-
-
-$sqltest = "
-SELECT 
-stt.teacheruid as teacher_id,
-stf.username as username,
-concat(u.lastname, ' ', u.firstname) as teachername,
-u.id as tutorid, 
-dis.name AS discipline
-FROM sirius_studtimetable stt
-LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
-LEFT JOIN mdl_user u ON stf.username = u.username 
-JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
-WHERE stt.markdelete = 0 AND stt.date >= 1591686000 AND u.username::varchar = 'b.nikolaev'
-ORDER BY stt.date
-";
+$dbresult = $DB->get_records_sql($sqltext, array($curdaystart, $USER->username));
 
 // какие поля выводить
 $arr_print_keys = array(
@@ -112,7 +70,6 @@ $arr_print_keys = array(
     'discipline' => 'discipline',
     'class' => 'class',
     'eventtype' => 'eventtype',
-    'teachername' => 'teachername',
     'department' => 'department',
 );
 $result = $resultAll = Array();
@@ -129,7 +86,8 @@ if (!count($result)) {
 
 $cols = '';
 
-$html = html_writer::start_tag('div', array('class' => 'main_container_studtimetable'));
+$html = "<h1>Расписание дисциплин {$USER->firstname} {$USER->lastname}</h1>";
+$html .= html_writer::start_tag('div', array('class' => 'main_container_studtimetable'));
 $html .= html_writer::start_tag('div', array('class' => 'studtimetable'));
 
 $first_el = key($result);
@@ -157,27 +115,11 @@ if (!empty($first_el)) {
             $html .= html_writer::start_tag('div', array('class' => 'row'));
             foreach ($arr_print_keys as $print_key => $fieldname) {
                 $val = $field->{$print_key};
-                switch ($print_key) {
-                    case 'teachername':
-                        $tutorid = $field->tutorid;
 
-                        if (empty($tutorid)) {
-                            $val = '';
-                            break;
-                        }
-
-                        $profileurl = new moodle_url('/message/index.php', array('id' => $tutorid));
-                        $valhtml = html_writer::start_tag('a', array('href' => $profileurl, 'target' => '_blank'));
-                        $valhtml .= $val;
-                        $valhtml .= html_writer::end_tag('a');
-
-                        $val = $valhtml;
-                        break;
-                    case 'timestart':
-                        if (!empty($val) && !empty($field->timeend)) {
-                            $val = date($timeformat, $val) . '-' . date($timeformat, $field->timeend);
-                        }
-                        break;
+                if("timestart" == $print_key){
+                    if (!empty($val) && !empty($field->timeend)) {
+                        $val = date($timeformat, $val) . '-' . date($timeformat, $field->timeend);
+                    }
                 }
 
                 $html .= html_writer::start_tag('div', array('class' => 'cell'));
