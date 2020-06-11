@@ -14,3 +14,4 @@ $string['eventtype'] = 'Вид занятия';
 $string['teachername'] = 'Преподаватель';
 $string['discipline'] = 'Дисциплина';
 $string['department'] = 'Кафедра';
+$string['group'] = 'Группа';

@@ -66,6 +66,8 @@ JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
 WHERE stt.markdelete = 0 AND stt.date >= ? AND u.username::varchar = ?
 ORDER BY stt.date, toc.timestart";
 
+$dbresult = $DB->get_records_sql($sqltext, array($curdaystart, $USER->username));
+
 // какие поля выводить
 $arr_print_keys = array(
     'timestart' => 'timestart',
@@ -75,10 +77,70 @@ $arr_print_keys = array(
     'department' => 'department',
     'group' => 'group'
 );
+$result = $resultAll = Array();
 
+foreach ($dbresult as $res)
+    $result[$res->date][] = $res;
+
+// если ничего нет - не выполняем дальше!
+if (!count($result)) {
+    \core\notification::warning(get_string('emptytimetable', 'local_student_timetable'));
+    echo $OUTPUT->footer();
+    die;
+}
+
+$cols = '';
+
+$html = "<h1>Расписание дисциплин {$USER->firstname} {$USER->lastname}</h1>";
+$html .= html_writer::start_tag('div', array('class' => 'main_container_studtimetable'));
+$html .= html_writer::start_tag('div', array('class' => 'studtimetable'));
+
+$first_el = key($result);
 $timeformat = 'H:i'; // формат времени начала и конца пары
+if (!empty($first_el)) {
+    // колонки
+    $cols .= html_writer::start_tag('div', array('class' => 'head row'));
+    foreach ($arr_print_keys as $val) {
+        $cols .= html_writer::start_tag('div', array('class' => 'cell'));
+        $cols .= get_string($val, 'local_student_timetable');
+        $cols .= html_writer::end_tag('div');
+    }
+    $cols .= html_writer::end_tag('div');
 
-$teacher_table = new Timetable($curdaystart, $sqltext, $arr_print_keys, $timeformat);
-echo $teacher_table->getTable();
+    foreach ($result as $date => $fields) {
+        // дата
+        $html .= html_writer::start_tag('div', array('class' => 'ttdate'));
+        $html .= date('d.m.Y', $date);
+        $html .= html_writer::end_tag('div');
 
+        $html .= html_writer::start_tag('div', array('class' => 'table'));
+        $html .= $cols;
+        // данные
+        foreach ($fields as $key => $field) {
+            $html .= html_writer::start_tag('div', array('class' => 'row'));
+            foreach ($arr_print_keys as $print_key => $fieldname) {
+                $val = $field->{$print_key};
+
+                if("timestart" == $print_key){
+                    if (!empty($val) && !empty($field->timeend)) {
+                        $val = date($timeformat, $val) . '-' . date($timeformat, $field->timeend);
+                    }
+                }
+
+                $html .= html_writer::start_tag('div', array('class' => 'cell'));
+                $html .= $val;
+                $html .= html_writer::end_tag('div');
+            }
+            $html .= html_writer::end_tag('div');
+        }
+        $html .= html_writer::end_tag('div');
+    }
+}
+
+$html .= html_writer::end_tag('div');
+$html .= html_writer::end_tag('div');
+
+echo $html,
 $OUTPUT->footer();
+?>
+
