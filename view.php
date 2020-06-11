@@ -3,13 +3,24 @@ require_once('classes/Timetable.php');
 use module\classes\timetable\Timetable;
 
 require_once('../../config.php');
+require_once('params.php');
 
-if (!isloggedin() OR isguestuser()) {
+if (!isloggedin() or isguestuser()) {
     require_login();
     die;
 }
 
 $context_sys = context_system::instance();
+
+$roles = get_user_roles($context_sys, $USER->id, true);
+foreach ($roles as $role) {
+    if($role->shortname = "editingteacher" || $role->shortname = "teacher"){
+        $showTeacherTable = [
+            'name' => 'teacher',
+            'show' => true
+        ];
+    }
+}
 
 $PAGE->set_url("$CFG->httpswwwroot/local/student_timetable/view.php");
 
@@ -41,44 +52,13 @@ $event->trigger();
 @$DB->execute("DELETE FROM sirius_studtimetable WHERE markdelete != 0");
 @$DB->execute("DELETE FROM sirius_studtimetable_elen WHERE markdelete != 0");
 
-$curdaystart = (int)mktime(0, 0, 0);
+$table = (new Timetable(
+    $table_params[$showTeacherTable['name']]['curdate'],
+    $table_params[$showTeacherTable['name']]['sql_text'],
+    $table_params[$showTeacherTable['name']]['arr_print_keys'],
+    $table_params[$showTeacherTable['name']]['timeformat'],
+    $table_params[$showTeacherTable['name']]['show']
+))->getTable();
 
-$sqltext = "SELECT 
-stt.uid, stt.date,
-toc.timestart, toc.timeend,
-cr.name AS class,
-g.name AS group,
-e.name AS eventtype,
-sg.username AS username,
-u.id AS tutorid, dis.name AS discipline,
-sd.name AS department,
-g.name AS groupname
-FROM sirius_studtimetable stt
-JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
-JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
-JOIN sirius_groups g ON stt.groupuid = g.uid
-JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
-LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
-LEFT JOIN {user} u ON stf.username = u.username
-JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
-LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
-JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
-WHERE stt.markdelete = 0 AND stt.date >= ? AND u.username::varchar = ?
-ORDER BY stt.date, toc.timestart";
-
-// какие поля выводить
-$arr_print_keys = array(
-    'timestart' => 'timestart',
-    'discipline' => 'discipline',
-    'class' => 'class',
-    'eventtype' => 'eventtype',
-    'department' => 'department',
-    'group' => 'group'
-);
-
-$timeformat = 'H:i'; // формат времени начала и конца пары
-
-$teacher_table = new Timetable($curdaystart, $sqltext, $arr_print_keys, $timeformat);
-echo $teacher_table->getTable();
-
+echo $table;
 $OUTPUT->footer();

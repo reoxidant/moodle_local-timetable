@@ -14,7 +14,7 @@ class Timetable
     private $tableData;
     private $tableHtml;
 
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat)
+    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $teacher = false)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
