@@ -42,7 +42,7 @@ $table_params = [
             stt.uid, stt.date,
             toc.timestart, toc.timeend,
             cr.name AS class,
-            g.name AS group,
+            g.name AS groupname,
             e.name AS eventtype,
             sg.username AS username,
             u.id AS tutorid, dis.name AS discipline,

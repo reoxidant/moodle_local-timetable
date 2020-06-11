@@ -64,10 +64,11 @@ class Timetable
             $this->tableHtml .= $this->getTableHeaderDate($date);
             $this->tableHtml .= \html_writer::start_tag('div', array('class' => 'table'));
             $this->tableHtml .= $this->getTableHtmlHeadColumns();
-
+            $groupsname = $this->getGroups($fields);
+            $fields = $this->getArrayUnique($fields);
             // данные
             foreach ($fields as $key => $field) {
-                $this->tableHtml .= $this->getTableCells($field);
+                $this->tableHtml .= $this->getTableCells($field, $groupsname);
             }
             $this->tableHtml .= \html_writer::end_tag('div');
         }
@@ -87,9 +88,7 @@ class Timetable
         return $cols;
     }
 
-
-
-    private function getTableCells($field){
+    private function getTableCells($field, $groupsname){
         $cell = \html_writer::start_tag('div', array('class' => 'row'));
             foreach ($this->arr_print_keys as $print_key => $fieldname) {
                 $val = $field->{$print_key};
@@ -97,6 +96,9 @@ class Timetable
                     if (!empty($val) && !empty($field->timeend)) {
                         $val = date($this->timeformat, $val) . '-' . date($this->timeformat, $field->timeend);
                     }
+                }
+                if($print_key == 'group'){
+                    $val = $groupsname;
                 }
                 $cell .= \html_writer::start_tag('div', array('class' => 'cell')) . $val . \html_writer::end_tag('div');
             }
@@ -112,6 +114,40 @@ class Timetable
             echo $OUTPUT->footer();
             die;
         }
+    }
+
+    private function getGroups($array){
+        $strArr = [];
+        foreach ($array as $key => $arr){
+            foreach ($arr as $key => $val){
+                if($key == 'groupname'){
+                    array_push($strArr, $val);
+                }
+            }
+        }
+        $str = implode(',', $strArr);
+        return $str;
+    }
+
+    public function getArrayUnique($array){
+        $join = [];
+        foreach ($array as $key => $arr){
+            if(!isset($join[0])){
+                $join[0] = $arr;
+            }
+            $print_keys = (array)$this->arr_print_keys;
+
+            foreach ($print_keys as $val){
+                $join_val = $join[0]->{$val};
+                $print_keys_val = $arr->{$val};
+
+                if(!$join_val == $print_keys_val && $print_keys_val != 'group'){
+                    $join[$key] = $arr;
+                    break;
+                }
+            }
+        }
+        return (array)$join;
     }
 
     public function getTable()
