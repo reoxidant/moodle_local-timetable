@@ -1,7 +1,7 @@
 <?php
 
 $table_params = [
-    'teacher' => [
+    'editingteacher' => [
         'sql_text' => "
         SELECT 
             stt.uid, stt.date,
@@ -34,7 +34,8 @@ $table_params = [
             'group' => 'group'
         ],
         'curdate' => (int)mktime(0, 0, 0),
-        'timeformat' => 'H:i'
+        'timeformat' => 'H:i',
+        'role' => 'teacher'
     ],
     'student' => [
         'sql_text' => "
@@ -42,12 +43,11 @@ $table_params = [
             stt.uid, stt.date,
             toc.timestart, toc.timeend,
             cr.name AS class,
-            g.name AS groupname,
+            g.name AS group,
             e.name AS eventtype,
             sg.username AS username,
             u.id AS tutorid, dis.name AS discipline,
-            sd.name AS department,
-            g.name AS groupname
+            sd.name AS department
         FROM sirius_studtimetable stt
             JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
             JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
@@ -65,10 +65,11 @@ $table_params = [
             'discipline' => 'discipline',
             'class' => 'class',
             'eventtype' => 'eventtype',
+            'teachername' => 'teachername',
             'department' => 'department',
-            'group' => 'group'
         ],
         'curdate' => (int)mktime(0, 0, 0),
-        'timeformat' => 'H:i'
+        'timeformat' => 'H:i',
+        'role' => 'student'
     ]
 ];

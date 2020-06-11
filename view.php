@@ -1,5 +1,6 @@
 <?php
 require_once('classes/Timetable.php');
+
 use module\classes\timetable\Timetable;
 
 require_once('../../config.php');
@@ -14,11 +15,8 @@ $context_sys = context_system::instance();
 
 $roles = get_user_roles($context_sys, $USER->id, true);
 foreach ($roles as $role) {
-    if($role->shortname = "editingteacher" || $role->shortname = "teacher"){
-        $showTeacherTable = [
-            'name' => 'teacher',
-            'show' => true
-        ];
+    if ($role->shortname == "editingteacher" || $role->shortname == "teacher" || $role->shortname == "student") {
+        $view_role = $role->shortname;
     }
 }
 
@@ -53,11 +51,11 @@ $event->trigger();
 @$DB->execute("DELETE FROM sirius_studtimetable_elen WHERE markdelete != 0");
 
 $table = (new Timetable(
-    $table_params[$showTeacherTable['name']]['curdate'],
-    $table_params[$showTeacherTable['name']]['sql_text'],
-    $table_params[$showTeacherTable['name']]['arr_print_keys'],
-    $table_params[$showTeacherTable['name']]['timeformat'],
-    $table_params[$showTeacherTable['name']]['show']
+    $table_params[$view_role]['curdate'],
+    $table_params[$view_role]['sql_text'],
+    $table_params[$view_role]['arr_print_keys'],
+    $table_params[$view_role]['timeformat'],
+    $table_params[$view_role]['role']
 ))->getTable();
 
 echo $table;

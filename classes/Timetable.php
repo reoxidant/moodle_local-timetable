@@ -13,8 +13,9 @@ class Timetable
     private $timeformat;
     private $tableData;
     private $tableHtml;
+    private $current_role;
 
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $teacher = false)
+    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student')
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
@@ -24,6 +25,7 @@ class Timetable
         global $DB;
         $this->moodle_database = $DB;
         $this->timeformat = $timeformat;
+        $this->current_role = $role;
     }
 
     public function getDatabaseResult()
@@ -64,8 +66,12 @@ class Timetable
             $this->tableHtml .= $this->getTableHeaderDate($date);
             $this->tableHtml .= \html_writer::start_tag('div', array('class' => 'table'));
             $this->tableHtml .= $this->getTableHtmlHeadColumns();
-            $groupsname = $this->getGroups($fields);
-            $fields = $this->getArrayUnique($fields);
+
+            if($this->current_role == 'teacher'){
+                $groupsname = $this->getGroups($fields);
+                $fields = $this->getArrayUnique($fields);
+            }
+
             // данные
             foreach ($fields as $key => $field) {
                 $this->tableHtml .= $this->getTableCells($field, $groupsname);
@@ -74,7 +80,8 @@ class Timetable
         }
     }
 
-    private function getTableHeaderDate($date){
+    private function getTableHeaderDate($date)
+    {
         return \html_writer::start_tag('div', array('class' => 'ttdate')) . date('d.m.Y', $date) . \html_writer::end_tag('div');
     }
 
@@ -88,20 +95,41 @@ class Timetable
         return $cols;
     }
 
-    private function getTableCells($field, $groupsname){
+    private function getTableCells($field, $groupsname = null)
+    {
         $cell = \html_writer::start_tag('div', array('class' => 'row'));
-            foreach ($this->arr_print_keys as $print_key => $fieldname) {
-                $val = $field->{$print_key};
-                if ("timestart" == $print_key) {
+        foreach ($this->arr_print_keys as $print_key => $fieldname) {
+            $val = $field->{$print_key};
+            switch ($print_key) {
+                case 'teachername':
+                    $tutorid = $field->tutorid;
+
+                    if (empty($tutorid)) {
+                        $val = '';
+                        break;
+                    }
+
+                    $profileurl = new moodle_url('/message/index.php', array('id' => $tutorid));
+                    $valhtml = html_writer::start_tag('a', array('href' => $profileurl, 'target' => '_blank'));
+                    $valhtml .= $val;
+                    $valhtml .= html_writer::end_tag('a');
+
+                    $val = $valhtml;
+                    break;
+
+                case 'timestart':
                     if (!empty($val) && !empty($field->timeend)) {
                         $val = date($this->timeformat, $val) . '-' . date($this->timeformat, $field->timeend);
                     }
-                }
-                if($print_key == 'group'){
+                    break;
+
+                case 'group':
                     $val = $groupsname;
-                }
-                $cell .= \html_writer::start_tag('div', array('class' => 'cell')) . $val . \html_writer::end_tag('div');
+                    break;
             }
+
+            $cell .= \html_writer::start_tag('div', array('class' => 'cell')) . $val . \html_writer::end_tag('div');
+        }
         $cell .= \html_writer::end_tag('div');
         return $cell;
     }
@@ -116,11 +144,12 @@ class Timetable
         }
     }
 
-    private function getGroups($array){
+    private function getGroups($array)
+    {
         $strArr = [];
-        foreach ($array as $key => $arr){
-            foreach ($arr as $key => $val){
-                if($key == 'groupname'){
+        foreach ($array as $key => $arr) {
+            foreach ($arr as $key => $val) {
+                if ($key == 'groupname') {
                     array_push($strArr, $val);
                 }
             }
@@ -129,19 +158,20 @@ class Timetable
         return $str;
     }
 
-    public function getArrayUnique($array){
+    public function getArrayUnique($array)
+    {
         $join = [];
-        foreach ($array as $key => $arr){
-            if(!isset($join[0])){
+        foreach ($array as $key => $arr) {
+            if (!isset($join[0])) {
                 $join[0] = $arr;
             }
             $print_keys = (array)$this->arr_print_keys;
 
-            foreach ($print_keys as $val){
+            foreach ($print_keys as $val) {
                 $join_val = $join[0]->{$val};
                 $print_keys_val = $arr->{$val};
 
-                if(!$join_val == $print_keys_val && $print_keys_val != 'group'){
+                if (!$join_val == $print_keys_val && $print_keys_val != 'group') {
                     $join[$key] = $arr;
                     break;
                 }
