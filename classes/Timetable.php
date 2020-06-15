@@ -1,6 +1,6 @@
 <?php
 
-namespace module\classes\timetable;
+namespace module\classes;
 
 
 class Timetable
@@ -14,6 +14,7 @@ class Timetable
     private $tableData;
     private $tableHtml;
     private $current_role;
+    private $endtime;
 
     function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student')
     {
@@ -47,6 +48,9 @@ class Timetable
     {
         return
             "<h1>Расписание дисциплин {$this->user->firstname} {$this->user->lastname}</h1>"
+            . \html_writer::start_tag('div', array('class' => 'calendar_table')) .
+            $this->getCalendar()
+            . \html_writer::end_tag('div')
             . \html_writer::start_tag('div', array('class' => 'main_container_studtimetable'))
             . \html_writer::start_tag('div', array('class' => 'studtimetable')) .
             $this->getTableBodyHtml()
@@ -92,7 +96,7 @@ class Timetable
     {
         $cols = \html_writer::start_tag('div', array('class' => 'head row'));
         foreach ($this->arr_print_keys as $val) {
-            $cols .= \html_writer::start_tag('div', array('class' => 'cell')) . get_string($val, 'local_student_timetable') . \html_writer::end_tag('div');
+            $cols .= \html_writer::start_tag('div', array('class' => 'cell')) . get_string($val, 'local_timetable') . \html_writer::end_tag('div');
         }
         $cols .= \html_writer::end_tag('div');
         return $cols;
@@ -137,7 +141,7 @@ class Timetable
     {
         if (!count($this->tableData)) {
             global $OUTPUT;
-            \core\notification::warning(get_string('emptytimetable', 'local_student_timetable'));
+            \core\notification::warning(get_string('emptytimetable', 'local_timetable'));
             echo $OUTPUT->footer();
             die;
         }
@@ -177,6 +181,48 @@ class Timetable
             }
         }
         return (array)$join;
+    }
+
+    private function getCalendar()
+    {
+        $maxDate = intval((end($this->tableData)[0])->date);
+        $cal = \html_writer::start_tag('label', array('class' => "start"));
+        $cal .= 'От:';
+        $cal .= \html_writer::end_tag('label');
+        $cal .= \html_writer::start_tag('input', array(
+            'type' => "date",
+            'name' => "trip-start",
+            'value' => "{$this->getDate()}",
+            'min' => "{$this->getDate()}",
+            'max' => "{$this->getDate($maxDate, true)}"
+        ));
+        $cal .= \html_writer::end_tag('input');
+
+        $cal .= \html_writer::start_tag('label', array('class' => "end"));
+        $cal .= "До:";
+        $cal .= \html_writer::end_tag('label');
+        $cal .= \html_writer::start_tag('input', array(
+            'type' => "date",
+            'name' => "trip-start",
+            'value' => "{$this->getDate()}",
+            'min' => "{$this->getDate()}",
+            'max' => "{$this->getDate($maxDate, true)}"
+        ));
+        $cal .= \html_writer::end_tag('input');
+
+        return $cal;
+    }
+
+    private function getDate($time = null, $isTimestamp = null)
+    {
+        if ($time && !$isTimestamp) {
+            $date = date("Y-m-d", strtotime($time));
+        } else if ($time && $isTimestamp) {
+            $date = date("Y-m-d", $time);
+        } else {
+            $date = date("Y-m-d", $this->curdaystart);
+        }
+        return $date;
     }
 
     public function getTable()

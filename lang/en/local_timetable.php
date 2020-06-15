@@ -1,7 +1,7 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-$string['student_timetable:view'] = 'Может видеть страницу расписания';
+$string['timetable:view'] = 'Может видеть страницу расписания';
 
 $string['pluginname'] = 'Расписание занятий';
 $string['view_page'] = 'Смотрит страницу расписания занятий';

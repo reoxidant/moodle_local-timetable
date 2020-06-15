@@ -11,26 +11,26 @@ if (!isloggedin() OR isguestuser()) {
 
 $context_sys = context_system::instance();
 
-$PAGE->set_url("$CFG->httpswwwroot/local/student_timetable/view.php");
+$PAGE->set_url("$CFG->httpswwwroot/local/timetable/view.php");
 
 $PAGE->set_context($context_sys);
 $PAGE->set_pagelayout('standard');
-$title = get_string('pluginname', 'local_student_timetable');
+$title = get_string('pluginname', 'local_timetable');
 $PAGE->navbar->add($title);
 $PAGE->set_heading($title);
 $PAGE->set_title($title);
 $PAGE->set_cacheable(false);
-$PAGE->requires->css('/local/student_timetable/styles.css');
+$PAGE->requires->css('/local/timetable/styles.css');
 echo $OUTPUT->header();
 
 // если нет прав - не продолжаем
-if (!has_capability('local/student_timetable:view', $context_sys)) {
-    \core\notification::warning(get_string('noaccess', 'local_student_timetable'));
+if (!has_capability('local/timetable:view', $context_sys)) {
+    \core\notification::warning(get_string('noaccess', 'local_timetable'));
     echo $OUTPUT->footer();
     die;
 }
 
-$event = \local_student_timetable\event\student_timetable_viewed::create(array(
+$event = \local_timetable\event\timetable_viewed::create(array(
     'objectid' => null,
     'context' => $context_sys,
 ));
@@ -84,7 +84,7 @@ foreach ($dbresult as $res)
 
 // если ничего нет - не выполняем дальше!
 if (!count($result)) {
-    \core\notification::warning(get_string('emptytimetable', 'local_student_timetable'));
+    \core\notification::warning(get_string('emptytimetable', 'local_timetable'));
     echo $OUTPUT->footer();
     die;
 }
@@ -102,7 +102,7 @@ if (!empty($first_el)) {
     $cols .= html_writer::start_tag('div', array('class' => 'head row'));
     foreach ($arr_print_keys as $val) {
         $cols .= html_writer::start_tag('div', array('class' => 'cell'));
-        $cols .= get_string($val, 'local_student_timetable');
+        $cols .= get_string($val, 'local_timetable');
         $cols .= html_writer::end_tag('div');
     }
     $cols .= html_writer::end_tag('div');

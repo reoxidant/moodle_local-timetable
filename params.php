@@ -9,6 +9,7 @@ $table_params = [
             cr.name AS class,
             g.name AS group,
             e.name AS eventtype,
+            concat(u.lastname, ' ', u.firstname) AS teachername,
             sg.username AS username,
             u.id AS tutorid, dis.name AS discipline,
             sd.name AS department,
@@ -27,11 +28,12 @@ $table_params = [
         ORDER BY stt.date, toc.timestart",
         'arr_print_keys' => [
             'timestart' => 'timestart',
+            'group' => 'group',
             'discipline' => 'discipline',
             'class' => 'class',
             'eventtype' => 'eventtype',
-            'department' => 'department',
-            'group' => 'group'
+            'teachername' => 'teachername',
+            'department' => 'department'
         ],
         'curdate' => (int)mktime(0, 0, 0),
         'timeformat' => 'H:i',

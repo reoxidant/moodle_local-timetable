@@ -50,3 +50,20 @@
 .studtimetable .table .row:nth-of-type(even) {
     background-color: #fafafa;
 }
+
+.calendar_table{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: center;
+    margin: 25px 0;
+}
+
+.calendar_table label {
+    margin: 3px 10px 3px 0 !important;
+}
+
+.calendar_table .end {
+    margin-left: 10px !important;
+}
