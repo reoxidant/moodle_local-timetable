@@ -28,7 +28,7 @@ class Timetable
         $this->current_role = $role;
     }
 
-    public function getDatabaseResult()
+    private function getDatabaseResult()
     {
         if ($this->current_role == "student") {
             return $this->moodle_database->get_records_sql($this->sqltext, array($this->user->username, $this->curdaystart));
@@ -157,7 +157,7 @@ class Timetable
         return $str;
     }
 
-    public function getArrayUnique($array)
+    private function getArrayUnique($array)
     {
         $join = [];
         foreach ($array as $key => $arr) {
