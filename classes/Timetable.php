@@ -30,6 +30,9 @@ class Timetable
 
     public function getDatabaseResult()
     {
+        if ($this->current_role == "student") {
+            return $this->moodle_database->get_records_sql($this->sqltext, array($this->user->username, $this->curdaystart));
+        }
         return $this->moodle_database->get_records_sql($this->sqltext, array($this->curdaystart, $this->user->username));
     }
 
@@ -67,7 +70,7 @@ class Timetable
             $this->tableHtml .= \html_writer::start_tag('div', array('class' => 'table'));
             $this->tableHtml .= $this->getTableHtmlHeadColumns();
 
-            if($this->current_role == 'teacher'){
+            if ($this->current_role == 'teacher') {
                 $groupsname = $this->getGroups($fields);
                 $fields = $this->getArrayUnique($fields);
             }
@@ -109,12 +112,8 @@ class Timetable
                         break;
                     }
 
-                    $profileurl = new moodle_url('/message/index.php', array('id' => $tutorid));
-                    $valhtml = html_writer::start_tag('a', array('href' => $profileurl, 'target' => '_blank'));
-                    $valhtml .= $val;
-                    $valhtml .= html_writer::end_tag('a');
-
-                    $val = $valhtml;
+                    $profileurl = new \moodle_url('/message/index.php', array('id' => $tutorid));
+                    $val = \html_writer::start_tag('a', array('href' => $profileurl, 'target' => '_blank')) . $val . \html_writer::end_tag('a');
                     break;
 
                 case 'timestart':

@@ -39,17 +39,18 @@ $table_params = [
     ],
     'student' => [
         'sql_text' => "
-        SELECT 
+        SELECT
             stt.uid, stt.date,
             toc.timestart, toc.timeend,
             cr.name AS class,
             g.name AS group,
             e.name AS eventtype,
-            sg.username AS username,
+            concat(u.lastname, ' ', u.firstname) AS teachername,
+            sg.username AS student_username, 
             u.id AS tutorid, dis.name AS discipline,
             sd.name AS department
         FROM sirius_studtimetable stt
-            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
+            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0 AND sg.username::varchar = ?
             JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
             JOIN sirius_groups g ON stt.groupuid = g.uid
             JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
@@ -58,7 +59,7 @@ $table_params = [
             JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
             LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
-        WHERE stt.markdelete = 0 AND stt.date >= ? AND u.username::varchar = ?
+        WHERE stt.markdelete = 0 AND stt.date >= ?
         ORDER BY stt.date, toc.timestart",
         'arr_print_keys' => [
             'timestart' => 'timestart',
