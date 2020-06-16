@@ -18,6 +18,9 @@ foreach ($roles as $role) {
     if ($role->shortname == "editingteacher" || $role->shortname == "teacher" || $role->shortname == "student") {
         $view_role = $role->shortname;
         break;
+    }else if($role->shortname == "manager"){
+        $view_role = $role->shortname;
+        break;
     }
 }
 if(!count($roles)){
@@ -34,6 +37,7 @@ $PAGE->set_heading($title);
 $PAGE->set_title($title);
 $PAGE->set_cacheable(false);
 $PAGE->requires->css('/local/timetable/styles.css');
+$PAGE->requires->js_call_amd('local_timetable/calendar', 'init');
 echo $OUTPUT->header();
 
 // если нет прав - не продолжаем
@@ -54,13 +58,14 @@ $event->trigger();
 @$DB->execute("DELETE FROM sirius_studtimetable WHERE markdelete != 0");
 @$DB->execute("DELETE FROM sirius_studtimetable_elen WHERE markdelete != 0");
 
-$table = (new Timetable(
+// old code
+/*$table = (new Timetable(
     $table_params[$view_role]['curdate'],
     $table_params[$view_role]['sql_text'],
     $table_params[$view_role]['arr_print_keys'],
     $table_params[$view_role]['timeformat'],
     $table_params[$view_role]['role']
-))->getTable();
+))->getTable();*/
 
 echo $table;
-$OUTPUT->footer();
+echo $OUTPUT->footer();
