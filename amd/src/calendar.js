@@ -14,7 +14,7 @@ define(
         $,
         Ajax,
         ItemSelectors,
-        Notification
+        notification
     ) {
 
         let addLoaderToPage = function (root) {
@@ -32,7 +32,6 @@ define(
 
         let startLoading = function (root) {
             let loadingIconContainer = root.find(ItemSelectors.containers.loadingIcon);
-            console.log(loadingIconContainer);
             loadingIconContainer.removeClass('hidden');
         };
 
@@ -41,37 +40,48 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content) {
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, dateMin = null, dateMax = null) {
             $.ajax({
                 type: "POST",
-                data: {role: role},
+                data: {role: role, dateMin: dateMin, dateMax: dateMax},
                 url: "ajax.php",
                 beforeSend: function () {
                     startLoading(root);
                 },
                 complete: function () {
                     stopLoading(root);
+                    registerEventListeners(role);
+                    if(dateMin.length != null && dateMax.length != null){
+                        $(ItemSelectors.calendar.inputStart).val(dateMin);
+                        $(ItemSelectors.calendar.inputEnd).val(dateMax);
+                    }
                 },
                 success: function (data) {
+                    content.empty();
                     content.append(data);
                 },
                 dataType: "html",
                 cache: "false",
-                error: Notification.exception
+                error: function(){
+                    notification.addNotification({
+                        message: "Не найдено ниодной дисциплины в заданом диапазоне дат.",
+                        type: "error"
+                    });
+                }
             });
         }
 
         let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
-                let item = e.target;
-                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent));
+                let minDate = $(ItemSelectors.calendar.inputStart).val();
+                let maxDate = $(ItemSelectors.calendar.inputEnd).val();
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), minDate, maxDate);
             });
         }
 
         return {
             init: function (role) {
                 addLoaderToPage(ItemSelectors.containers.pageContent);
-                registerEventListeners(role);
                 loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent));
             }
         }

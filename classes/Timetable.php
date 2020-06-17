@@ -13,8 +13,9 @@ class Timetable
     private $tableData;
     private $tableHtml;
     private $current_role;
+    private $date;
 
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student')
+    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
@@ -25,6 +26,11 @@ class Timetable
         $this->moodle_database = $DB;
         $this->timeformat = $timeformat;
         $this->current_role = $role;
+        if(!empty($dateMax) && !empty($dateMin)) :
+            $this->date = $dateMin.' AND stt.date <= '.$dateMax;
+        else:
+            $this->date = $this->curdaystart;
+        endif;
     }
 
     private function getDatabaseResult()
@@ -33,7 +39,7 @@ class Timetable
             return $this->moodle_database->get_records_sql($this->sqltext, array($this->user->username, $this->curdaystart));
         }
         else if($this->current_role == "manager"){
-            return $this->moodle_database->get_records_sql($this->sqltext, array($this->curdaystart));
+            return $this->moodle_database->get_records_sql($this->sqltext, array($this->date));
         }
         return $this->moodle_database->get_records_sql($this->sqltext, array($this->curdaystart, $this->user->username));
     }

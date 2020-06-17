@@ -97,7 +97,7 @@ $table_params = [
             JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
             LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
-        WHERE stt.markdelete = 0 AND stt.date >= ?
+        WHERE stt.markdelete = 0 AND stt.date::varchar >= ?
         ORDER BY stt.date, toc.timestart",
         'arr_print_keys' => [
             'timestart' => 'timestart',
