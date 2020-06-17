@@ -18,10 +18,16 @@ define(
     ){
 
         let addLoaderToPage = function (root){
-            $(root).
-            append("<span></span>").addClass("overlay-icon-container hidden").attr("data-region","overlay-icon-container").
-            append("<span></span>").addClass("loading-icon icon-no-margin").
-            append("<i></i>").addClass("icon fa fa-circle-o-notch fa-spin fa-fw").attr("title", "Загрузка").attr("aria-label", "Загрузка");
+            $(root).append($('<span>', {
+                class: "overlay-icon-container hidden",
+                "data-region": "overlay-icon-container"
+            }).append($('<span>', {
+                class: "loading-icon icon-no-margin"
+            }).append($('<i>', {
+                class: "icon fa fa-circle-o-notch fa-spin fa-fw",
+                title: "Загрузка",
+                "aria-label": "Загрузка"
+            }))));
         }
 
         let startLoading = function (root) {
@@ -60,16 +66,15 @@ define(
                 console.log(item);
                 refreshTimetable(ItemSelectors.timetable, item.value);
             });
-
         }
 
         return{
             init:function () {
                 addLoaderToPage("#page-content");
-                startLoading(ItemSelectors.containers.timetable);
-                $(window).ready(function() {
-                    registerEventListeners();
-                });
+                // startLoading(ItemSelectors.containers.timetable);
+                // $(window).ready(function() {
+                //     registerEventListeners();
+                // });
             }
         }
     }
