@@ -5,10 +5,10 @@ define([], function () {
             inputEnd: ".input-end"
         },
         containers: {
-            root: '#region-main',
             loadingIcon: '[data-region="overlay-icon-container"]',
             calendar: ".calendar_table",
-            timetable: ".main_container_studtimetable"
+            timetable: ".main_container_studtimetable",
+            pageContent: "#region-main-box"
         }
     };
 });

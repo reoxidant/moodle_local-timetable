@@ -70,11 +70,11 @@ define(
 
         return{
             init:function () {
-                addLoaderToPage("#page-content");
-                // startLoading(ItemSelectors.containers.timetable);
-                // $(window).ready(function() {
-                //     registerEventListeners();
-                // });
+                addLoaderToPage(ItemSelectors.containers.pageContent);
+                startLoading($(ItemSelectors.containers.pageContent));
+                $(document).ready(function() {
+                     registerEventListeners();
+                });
             }
         }
     }

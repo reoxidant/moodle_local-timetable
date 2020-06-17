@@ -67,3 +67,7 @@
 .calendar_table .end {
     margin-left: 10px !important;
 }
+
+#region-main{
+    height: 100% !important;
+}
