@@ -10,14 +10,14 @@ define(
         'core/ajax',
         'local_timetable/selectors',
         'core/notification'
-    ], function(
+    ], function (
         $,
         Ajax,
         ItemSelectors,
         Notification
-    ){
+    ) {
 
-        let addLoaderToPage = function (root){
+        let addLoaderToPage = function (root) {
             $(root).append($('<span>', {
                 class: "overlay-icon-container hidden",
                 "data-region": "overlay-icon-container"
@@ -41,21 +41,19 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function(role, root = $(ItemSelectors.containers.mainContent)) {
-
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content) {
             $.ajax({
                 type: "POST",
-                data: {role:role},
+                data: {role: role},
                 url: "ajax.php",
-                async: false,
-                beforeSend: function(){
+                beforeSend: function () {
                     startLoading(root);
                 },
-                complete:function(){
+                complete: function () {
                     stopLoading(root);
                 },
                 success: function (data) {
-                    root.append(data);
+                    content.append(data);
                 },
                 dataType: "html",
                 cache: "false",
@@ -63,18 +61,18 @@ define(
             });
         }
 
-        let registerEventListeners = function() {
+        let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
                 let item = e.target;
-                loadTimetable(ItemSelectors.containers.timetable, item.value);
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent));
             });
         }
 
-        return{
-            init: function(role){
-
+        return {
+            init: function (role) {
                 addLoaderToPage(ItemSelectors.containers.pageContent);
-                loadTimetable(role);
+                registerEventListeners(role);
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent));
             }
         }
     }
