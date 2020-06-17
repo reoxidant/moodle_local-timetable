@@ -32,6 +32,7 @@ define(
 
         let startLoading = function (root) {
             let loadingIconContainer = root.find(ItemSelectors.containers.loadingIcon);
+            console.log(loadingIconContainer);
             loadingIconContainer.removeClass('hidden');
         };
 
@@ -40,41 +41,40 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let refreshTimetable = function(body, date) {
-            startLoading(body);
+        let loadTimetable = function(role, root = $(ItemSelectors.containers.mainContent)) {
 
-            return updateContent(date)
-                .then(function() {
-                    console.log('Success!');
-                })
-                .always(function() {
-                    return stopLoading(body);
-                })
-                .fail(Notification.exception);
-        };
-
-        let updateContent = function() {
-            let request = {
-                methodname: 'local_timetable_classes_timetable_gettable'
-            };
-            return Ajax.call([request])[0];
-        };
+            $.ajax({
+                type: "POST",
+                data: {role:role},
+                url: "ajax.php",
+                async: false,
+                beforeSend: function(){
+                    startLoading(root);
+                },
+                complete:function(){
+                    stopLoading(root);
+                },
+                success: function (data) {
+                    root.append(data);
+                },
+                dataType: "html",
+                cache: "false",
+                error: Notification.exception
+            });
+        }
 
         let registerEventListeners = function() {
             $(ItemSelectors.containers.calendar).change(function (e) {
                 let item = e.target;
-                console.log(item);
-                refreshTimetable(ItemSelectors.timetable, item.value);
+                loadTimetable(ItemSelectors.containers.timetable, item.value);
             });
         }
 
         return{
-            init:function () {
+            init: function(role){
+
                 addLoaderToPage(ItemSelectors.containers.pageContent);
-                startLoading($(ItemSelectors.containers.pageContent));
-                $(document).ready(function() {
-                     registerEventListeners();
-                });
+                loadTimetable(role);
             }
         }
     }

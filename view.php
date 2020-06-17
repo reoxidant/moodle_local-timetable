@@ -1,10 +1,5 @@
 <?php
-require_once('classes/Timetable.php');
-
-use module\classes\Timetable;
-
 require_once('../../config.php');
-require_once('params.php');
 
 if (!isloggedin() or isguestuser()) {
     require_login();
@@ -28,7 +23,6 @@ if(!count($roles)){
 }
 
 $PAGE->set_url("$CFG->httpswwwroot/local/timetable/view.php");
-
 $PAGE->set_context($context_sys);
 $PAGE->set_pagelayout('standard');
 $title = get_string('pluginname', 'local_timetable');
@@ -37,7 +31,7 @@ $PAGE->set_heading($title);
 $PAGE->set_title($title);
 $PAGE->set_cacheable(false);
 $PAGE->requires->css('/local/timetable/styles.css');
-$PAGE->requires->js_call_amd('local_timetable/calendar', 'init');
+$PAGE->requires->js_call_amd('local_timetable/calendar', 'init', array($view_role));
 echo $OUTPUT->header();
 
 // если нет прав - не продолжаем
@@ -58,14 +52,4 @@ $event->trigger();
 @$DB->execute("DELETE FROM sirius_studtimetable WHERE markdelete != 0");
 @$DB->execute("DELETE FROM sirius_studtimetable_elen WHERE markdelete != 0");
 
-// old code
-/*$table = (new Timetable(
-    $table_params[$view_role]['curdate'],
-    $table_params[$view_role]['sql_text'],
-    $table_params[$view_role]['arr_print_keys'],
-    $table_params[$view_role]['timeformat'],
-    $table_params[$view_role]['role']
-))->getTable();*/
-
-echo $table;
 echo $OUTPUT->footer();

@@ -48,8 +48,7 @@ class Timetable
     private function getTableHtml()
     {
         return
-            $this->getLoader()
-            . "<h1>Расписание дисциплин {$this->user->firstname} {$this->user->lastname}</h1>"
+            "<h1>Расписание дисциплин {$this->user->firstname} {$this->user->lastname}</h1>"
             . \html_writer::start_tag('div', array('class' => 'calendar_table')) .
             $this->getCalendar()
             . \html_writer::end_tag('div')
@@ -225,13 +224,6 @@ class Timetable
             $date = date("Y-m-d", $this->curdaystart);
         }
         return $date;
-    }
-
-    private function getLoader(){
-        return "
-            <span class='overlay-icon-container hidden' data-region='overlay-icon-container'>
-                <span class='loading-icon icon-no-margin'><i class='icon fa fa-circle-o-notch fa-spin fa-fw' title='Загрузка' aria-label='Загрузка'></i></span>
-            </span>";
     }
 
     public function getTable()

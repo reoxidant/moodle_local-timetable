@@ -8,7 +8,8 @@ define([], function () {
             loadingIcon: '[data-region="overlay-icon-container"]',
             calendar: ".calendar_table",
             timetable: ".main_container_studtimetable",
-            pageContent: "#region-main-box"
+            pageContent: "#region-main-box",
+            mainContent: "[role='main']"
         }
     };
 });
