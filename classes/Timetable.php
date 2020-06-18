@@ -40,7 +40,8 @@ class Timetable
     private function getDatabaseResult()
     {
         if ($this->current_role == "student") {
-            return $this->moodle_database->get_records_sql($this->sqltext, array($this->user->username, $this->curdaystart));
+            array_unshift($this->sql_param, $this->user->username);
+            return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         } else if ($this->current_role == "manager") {
             return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
