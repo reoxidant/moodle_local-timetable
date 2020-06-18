@@ -1,21 +1,21 @@
-<?php  // Moodle configuration file
+<?php // Moodle configuration file
 
 unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-$CFG->dbtype    = 'mysqli';
+$CFG->dbtype = 'mysqli';
 $CFG->dblibrary = 'native';
-$CFG->dbhost    = 'localhost';
-$CFG->dbname    = 'moodle';
-$CFG->dbuser    = 'root';
-$CFG->dbpass    = 1234;
-$CFG->prefix    = 'mdl_';
-$CFG->dboptions = array (
-  'dbpersist' => 0,
-  'dbport' => '',
-  'dbsocket' => '',
-  'dbcollation' => 'utf8mb4_unicode_ci',
+$CFG->dbhost = 'localhost';
+$CFG->dbname = 'moodle';
+$CFG->dbuser = 'root';
+$CFG->dbpass = 1234;
+$CFG->prefix = 'mdl_';
+$CFG->dboptions = array(
+    'dbpersist' => 0,
+    'dbport' => '',
+    'dbsocket' => '',
+    'dbcollation' => 'utf8mb4_unicode_ci',
 );
 
 /*$CFG->dbtype    = 'pgsql';      // 'pgsql', 'mariadb', 'mysqli', 'mssql', 'sqlsrv' or 'oci'
@@ -41,9 +41,9 @@ $CFG->dboptions = array(
     //  default port
 );*/
 
-$CFG->wwwroot   = 'http://moodle.loc';
-$CFG->dataroot  = 'C:\\OSPanel\\domains\\moodledata';
-$CFG->admin     = 'admin';
+$CFG->wwwroot = 'http://moodle.loc';
+$CFG->dataroot = 'C:\\OSPanel\\domains\\moodledata';
+$CFG->admin = 'admin';
 $CFG->passwordsaltalt1 = ''; // пустой для входа админа с паролем 12345
 $CFG->passwordsaltmain = 'оставить старый passwordsaltmain';
 
@@ -58,10 +58,10 @@ require_once(__DIR__ . '/lib/setup.php');
 $CFG->phpunit_prefix = 'phpu_';
 $CFG->phpunit_dataroot = 'C:\\OSPanel\\domains\\phpu_moodledata';
 
-$CFG->dboptions = array (
-    'logall'   => true,
-    'logslow'  => 5,
-    'logerrors'  => true,
+$CFG->dboptions = array(
+    'logall' => true,
+    'logslow' => 5,
+    'logerrors' => true,
 );
 
 $CFG->defaultblocks_override = 'calendar_month:news_items,calendar_upcoming,recent_activity';

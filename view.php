@@ -13,12 +13,12 @@ foreach ($roles as $role) {
     if ($role->shortname == "editingteacher" || $role->shortname == "teacher" || $role->shortname == "student") {
         $view_role = $role->shortname;
         break;
-    }else if($role->shortname == "manager"){
+    } else if ($role->shortname == "manager") {
         $view_role = $role->shortname;
         break;
     }
 }
-if(!count($roles)){
+if (!count($roles)) {
     $view_role = "student";
 }
 

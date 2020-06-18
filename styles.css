@@ -51,8 +51,8 @@
     background-color: #fafafa;
 }
 
-.calendar_table{
-    display:flex;
+.calendar_table {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -68,6 +68,6 @@
     margin-left: 10px !important;
 }
 
-#region-main{
+#region-main {
     height: 100% !important;
 }

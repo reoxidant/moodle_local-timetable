@@ -1,10 +1,11 @@
 <?php
 require_once('classes/Timetable.php');
+
 use module\classes\timetable\Timetable;
 
 require_once('../../config.php');
 
-if (!isloggedin() OR isguestuser()) {
+if (!isloggedin() or isguestuser()) {
     require_login();
     die;
 }
@@ -77,7 +78,7 @@ $arr_print_keys = array(
     'department' => 'department',
     'group' => 'group'
 );
-$result = $resultAll = Array();
+$result = $resultAll = array();
 
 foreach ($dbresult as $res)
     $result[$res->date][] = $res;
@@ -121,7 +122,7 @@ if (!empty($first_el)) {
             foreach ($arr_print_keys as $print_key => $fieldname) {
                 $val = $field->{$print_key};
 
-                if("timestart" == $print_key){
+                if ("timestart" == $print_key) {
                     if (!empty($val) && !empty($field->timeend)) {
                         $val = date($timeformat, $val) . '-' . date($timeformat, $field->timeend);
                     }

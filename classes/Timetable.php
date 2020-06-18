@@ -13,9 +13,10 @@ class Timetable
     private $tableData;
     private $tableHtml;
     private $current_role;
-    private $date;
+    private $sql_param;
+    private $constDate;
 
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax)
+    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax, $arrCurMinAndMaxDate = null)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
@@ -26,20 +27,22 @@ class Timetable
         $this->moodle_database = $DB;
         $this->timeformat = $timeformat;
         $this->current_role = $role;
-        if(!empty($dateMax) && !empty($dateMin)) :
-            $this->date = $dateMin.' AND stt.date <= '.$dateMax;
+        if (!empty($dateMax) && !empty($dateMin)) :
+            $this->sql_param = [$dateMin, $dateMax];
         else:
-            $this->date = $this->curdaystart;
+            $this->sql_param = [$this->curdaystart];
         endif;
+        if ($arrCurMinAndMaxDate) {
+            $this->constDate = $arrCurMinAndMaxDate;
+        }
     }
 
     private function getDatabaseResult()
     {
         if ($this->current_role == "student") {
             return $this->moodle_database->get_records_sql($this->sqltext, array($this->user->username, $this->curdaystart));
-        }
-        else if($this->current_role == "manager"){
-            return $this->moodle_database->get_records_sql($this->sqltext, array($this->date));
+        } else if ($this->current_role == "manager") {
+            return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
         return $this->moodle_database->get_records_sql($this->sqltext, array($this->curdaystart, $this->user->username));
     }
@@ -224,8 +227,10 @@ class Timetable
     {
         if ($time && !$isTimestamp) {
             $date = date("Y-m-d", strtotime($time));
-        } else if ($time && $isTimestamp) {
+        } else if ($time && $isTimestamp && !$this->constDate) {
             $date = date("Y-m-d", $time);
+        } else if ($time && $isTimestamp && $this->constDate) {
+            $date = $this->constDate[1];
         } else {
             $date = date("Y-m-d", $this->curdaystart);
         }

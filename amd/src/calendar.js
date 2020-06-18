@@ -40,10 +40,10 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, dateMin = null, dateMax = null) {
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate, curMinAndMaxDate) {
             $.ajax({
                 type: "POST",
-                data: {role: role, dateMin: dateMin, dateMax: dateMax},
+                data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate, curMinAndMaxDate: curMinAndMaxDate},
                 url: "ajax.php",
                 beforeSend: function () {
                     startLoading(root);
@@ -51,9 +51,9 @@ define(
                 complete: function () {
                     stopLoading(root);
                     registerEventListeners(role);
-                    if(dateMin.length != null && dateMax.length != null){
-                        $(ItemSelectors.calendar.inputStart).val(dateMin);
-                        $(ItemSelectors.calendar.inputEnd).val(dateMax);
+                    if (setValMinAndMaxDate) {
+                        $(ItemSelectors.calendar.inputStart).val(setValMinAndMaxDate[0]);
+                        $(ItemSelectors.calendar.inputEnd).val(setValMinAndMaxDate[1]);
                     }
                 },
                 success: function (data) {
@@ -62,7 +62,7 @@ define(
                 },
                 dataType: "html",
                 cache: "false",
-                error: function(){
+                error: function () {
                     notification.addNotification({
                         message: "Не найдено ниодной дисциплины в заданом диапазоне дат.",
                         type: "error"
@@ -73,9 +73,16 @@ define(
 
         let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
-                let minDate = $(ItemSelectors.calendar.inputStart).val();
-                let maxDate = $(ItemSelectors.calendar.inputEnd).val();
-                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), minDate, maxDate);
+                let setValMinAndMaxDate = [
+                    $(ItemSelectors.calendar.inputStart).val(),
+                    $(ItemSelectors.calendar.inputEnd).val()
+                ];
+                let curMinAndMaxDate =
+                    [
+                        $(ItemSelectors.calendar.inputStart).attr('min'),
+                        $(ItemSelectors.calendar.inputStart).attr('max')
+                    ];
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), setValMinAndMaxDate, curMinAndMaxDate);
             });
         }
 
