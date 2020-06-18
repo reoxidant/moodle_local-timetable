@@ -1,0 +1,73 @@
+.main_container_studtimetable {
+    overflow: auto;
+}
+
+.studtimetable {
+    min-width: 900px;
+}
+
+.studtimetable .table {
+    display: table;
+    width: 100%;
+    table-layout: fixed
+}
+
+.studtimetable .table .row {
+    display: table-row;
+    text-align: center;
+}
+
+.studtimetable .table .cell {
+    display: table-cell;
+    width: 100%;
+    word-wrap: break-word;
+}
+
+.studtimetable .ttdate {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    margin: auto;
+    border: none;
+    padding: 5px;
+    font-weight: bold;
+    background-color: #eceeef;
+    font-size: 18px;
+}
+
+.studtimetable .table .cell {
+    border-top: 1px solid #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
+    padding: 5px;
+    vertical-align: middle;
+}
+
+.studtimetable .table .head .cell {
+    font-weight: bold;
+    padding: 5px;
+}
+
+.studtimetable .table .row:nth-of-type(even) {
+    background-color: #fafafa;
+}
+
+.calendar_table {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: center;
+    margin: 25px 0;
+}
+
+.calendar_table label {
+    margin: 3px 10px 3px 0 !important;
+}
+
+.calendar_table .text-end {
+    margin-left: 10px !important;
+}
+
+#region-main {
+    height: 100% !important;
+}
