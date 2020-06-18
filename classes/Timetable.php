@@ -45,7 +45,8 @@ class Timetable
         } else if ($this->current_role == "manager") {
             return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
-        return $this->moodle_database->get_records_sql($this->sqltext, array($this->curdaystart, $this->user->username));
+        array_push($this->sql_param, $this->user->username);
+        return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
     }
 
     private function setTableData()
