@@ -16,17 +16,23 @@ if ($setValMinAndMaxDate) {
     list($yX, $mX, $dX) = explode('-', $setValMinAndMaxDate[1]);
 }
 
-function checkPreference($minAndMaxValue){
+/**
+ * @param $minAndMaxValue
+ * @return array|null
+ * @throws coding_exception
+ */
+function checkPreference($minAndMaxValue)
+{
     $minDate = get_user_preferences("local_timetable_user_preferences_min");
     $maxDate = get_user_preferences("local_timetable_user_preferences_max");
 
-    if($minAndMaxValue !== null){
+    if ($minAndMaxValue !== null) {
         set_user_preference("local_timetable_user_preferences_min", $minAndMaxValue[0]);
         set_user_preference("local_timetable_user_preferences_max", $minAndMaxValue[1]);
         return $minAndMaxValue;
-    }else if($minDate and $maxDate){
+    } else if ($minDate and $maxDate) {
         return [$minDate, $maxDate];
-    }else{
+    } else {
         set_user_preference("local_timetable_user_preferences_min", 0);
         set_user_preference("local_timetable_user_preferences_max", 0);
         return null;

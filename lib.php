@@ -21,6 +21,9 @@ function local_timetable_user_preferences_min()
     return $preferences;
 }
 
+/**
+ * @return array
+ */
 function local_timetable_user_preferences_max()
 {
     $preferences = array();

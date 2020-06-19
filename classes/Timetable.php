@@ -2,21 +2,71 @@
 
 namespace module\classes;
 
+/**
+ * Class Timetable
+ * @package module\classes
+ */
 class Timetable
 {
+    /**
+     * @var timestamp
+     */
     private $curdaystart;
+    /**
+     * @var string
+     */
     private $sqltext;
+    /**
+     * @var array
+     */
     private $arr_print_keys;
+    /**
+     * @var bool|false|mixed|object|\stdClass
+     */
     private $user;
+    /**
+     * @var \moodle_database|null
+     */
     private $moodle_database;
+    /**
+     * @var string
+     */
     private $timeformat;
+    /**
+     * @var array database
+     */
     private $tableData;
+    /**
+     * @var string html
+     */
     private $tableHtml;
+    /**
+     * @var string
+     */
     private $current_role;
+    /**
+     * @var array
+     */
     private $sql_param;
+    /**
+     * @var timestamp
+     */
     private $dateMin;
+    /**
+     * @var timestamp
+     */
     private $dateMax;
 
+    /**
+     * Timetable constructor.
+     * @param $mktime
+     * @param $sqltext
+     * @param $arr_print_keys
+     * @param $timeformat
+     * @param string $role
+     * @param $dateMin
+     * @param $dateMax
+     */
     function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax)
     {
         $this->curdaystart = $mktime;
@@ -37,6 +87,10 @@ class Timetable
         endif;
     }
 
+    /**
+     * @return array database
+     * @throws \dml_exception
+     */
     private function getDatabaseResult()
     {
         if ($this->current_role == "student") {
@@ -49,6 +103,10 @@ class Timetable
         return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
     }
 
+    /**
+     * @set $this->tableData
+     * @throws \dml_exception
+     */
     private function setTableData()
     {
         foreach ($this->getDatabaseResult() as $res) {
@@ -56,6 +114,9 @@ class Timetable
         }
     }
 
+    /**
+     * @return html_elements calendar + table body
+     */
     private function getTableHtml()
     {
         return
@@ -70,6 +131,9 @@ class Timetable
             . \html_writer::end_tag('div');
     }
 
+    /**
+     * @return html_elements table body
+     */
     private function getTableBodyHtml()
     {
         if (!empty(key($this->tableData))) {
@@ -78,6 +142,10 @@ class Timetable
         }
     }
 
+    /**
+     * @param $this->tableHtml
+     * @set $this->tableHtml table html elements
+     */
     private function setTableHtml()
     {
         foreach ($this->tableData as $date => $fields) {
@@ -99,11 +167,19 @@ class Timetable
         }
     }
 
+    /**
+     * @param $date
+     * @return string
+     */
     private function getTableHeaderDate($date)
     {
         return \html_writer::start_tag('div', array('class' => 'ttdate')) . date('d.m.Y', $date) . \html_writer::end_tag('div');
     }
 
+    /**
+     * @return string
+     * @throws \coding_exception
+     */
     private function getTableHtmlHeadColumns()
     {
         $cols = \html_writer::start_tag('div', array('class' => 'head row'));
@@ -114,6 +190,12 @@ class Timetable
         return $cols;
     }
 
+    /**
+     * @param $field
+     * @param null $groupsname
+     * @return string
+     * @throws \moodle_exception
+     */
     private function getTableCells($field, $groupsname = null)
     {
         $cell = \html_writer::start_tag('div', array('class' => 'row'));
@@ -149,6 +231,9 @@ class Timetable
         return $cell;
     }
 
+    /**
+     * @throws \coding_exception
+     */
     private function isEmptyTableData()
     {
         if (!count($this->tableData)) {
@@ -159,6 +244,10 @@ class Timetable
         }
     }
 
+    /**
+     * @param $array
+     * @return string
+     */
     private function getGroups($array)
     {
         $strArr = [];
@@ -173,6 +262,10 @@ class Timetable
         return $str;
     }
 
+    /**
+     * @param $array
+     * @return array
+     */
     private function getArrayUnique($array)
     {
         $join = [];
@@ -195,6 +288,9 @@ class Timetable
         return (array)$join;
     }
 
+    /**
+     * @return string html calendar
+     */
     private function getCalendar()
     {
         $maxDate = intval((end($this->tableData)[0])->date);
@@ -204,7 +300,7 @@ class Timetable
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-start",
-            'value' => ($this->dateMin)? $this->getDate($this->dateMin, true): $this->getDate(),
+            'value' => ($this->dateMin) ? $this->getDate($this->dateMin, true) : $this->getDate(),
             'min' => "{$this->getDate()}",
             'max' => "{$this->getDate($maxDate, true)}"
         ));
@@ -216,7 +312,7 @@ class Timetable
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-end",
-            'value' => ($this->dateMax)? $this->getDate($this->dateMax, true) : $this->getDate($maxDate, true),
+            'value' => ($this->dateMax) ? $this->getDate($this->dateMax, true) : $this->getDate($maxDate, true),
             'min' => "{$this->getDate()}",
             'max' => "{$this->getDate($maxDate, true)}"
         ));
@@ -225,18 +321,30 @@ class Timetable
         return $cal;
     }
 
+    /**
+     * @param null $time
+     * @param null $isTimestamp
+     * @param bool $constDate
+     * @return false|string
+     */
     private function getDate($time = null, $isTimestamp = null, $constDate = false)
     {
         if ($time && !$isTimestamp) {
             $date = date("Y-m-d", strtotime($time));
         } else if ($time && $isTimestamp && !$constDate) {
             $date = date("Y-m-d", $time);
-        }  else {
+        } else {
             $date = date("Y-m-d", $this->curdaystart);
         }
         return $date;
     }
 
+    /**
+     * @return table_html
+     * @set array database
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function getTable()
     {
         $this->setTableData();
