@@ -14,11 +14,10 @@ class Timetable
     private $tableHtml;
     private $current_role;
     private $sql_param;
-    private $constDate;
     private $dateMin;
     private $dateMax;
 
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax, $arrCurMinAndMaxDate = null)
+    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
@@ -36,9 +35,6 @@ class Timetable
         else:
             $this->sql_param = [$this->curdaystart];
         endif;
-        if ($arrCurMinAndMaxDate) {
-            $this->constDate = $arrCurMinAndMaxDate;
-        }
     }
 
     private function getDatabaseResult()
@@ -229,15 +225,13 @@ class Timetable
         return $cal;
     }
 
-    private function getDate($time = null, $isTimestamp = null)
+    private function getDate($time = null, $isTimestamp = null, $constDate = false)
     {
         if ($time && !$isTimestamp) {
             $date = date("Y-m-d", strtotime($time));
-        } else if ($time && $isTimestamp && !$this->constDate) {
+        } else if ($time && $isTimestamp && !$constDate) {
             $date = date("Y-m-d", $time);
-        } else if ($time && $isTimestamp && $this->constDate) {
-            $date = $this->constDate[1];
-        } else {
+        }  else {
             $date = date("Y-m-d", $this->curdaystart);
         }
         return $date;

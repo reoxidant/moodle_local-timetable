@@ -40,7 +40,7 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate, curMinAndMaxDate) {
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate) {
             let dbMaxDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_min");
             let dbMinDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_max");
 
@@ -50,7 +50,7 @@ define(
 
             $.ajax({
                 type: "POST",
-                data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate, curMinAndMaxDate: curMinAndMaxDate},
+                data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate},
                 url: "ajax.php",
                 beforeSend: function () {
                     startLoading(root);
@@ -131,12 +131,7 @@ define(
                     $(ItemSelectors.calendar.inputStart).val(),
                     $(ItemSelectors.calendar.inputEnd).val()
                 ];
-                let curMinAndMaxDate =
-                    [
-                        $(ItemSelectors.calendar.inputStart).attr('min'),
-                        $(ItemSelectors.calendar.inputStart).attr('max')
-                    ];
-                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), setValMinAndMaxDate, curMinAndMaxDate);
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), setValMinAndMaxDate);
             });
         }
 
