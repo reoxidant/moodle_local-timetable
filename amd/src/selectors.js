@@ -1,6 +1,7 @@
 define([], function () {
     return {
         calendar: {
+            wrapper:".calendar_table",
             wrapperAndInputs: ".calendar_table > input",
             inputStart: ".input-start",
             inputEnd: ".input-end"

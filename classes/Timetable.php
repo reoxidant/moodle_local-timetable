@@ -15,6 +15,8 @@ class Timetable
     private $current_role;
     private $sql_param;
     private $constDate;
+    private $dateMin;
+    private $dateMax;
 
     function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax, $arrCurMinAndMaxDate = null)
     {
@@ -27,6 +29,8 @@ class Timetable
         $this->moodle_database = $DB;
         $this->timeformat = $timeformat;
         $this->current_role = $role;
+        $this->dateMin = $dateMin;
+        $this->dateMax = $dateMax;
         if (!empty($dateMax) && !empty($dateMin)) :
             $this->sql_param = [$dateMin, $dateMax];
         else:
@@ -60,7 +64,7 @@ class Timetable
     {
         return
             "<h1>Расписание дисциплин {$this->user->firstname} {$this->user->lastname}</h1>"
-            . \html_writer::start_tag('div', array('class' => 'calendar_table')) .
+            . \html_writer::start_tag('div', array('class' => 'calendar_table', 'userid' => "{$this->user->id}")) .
             $this->getCalendar()
             . \html_writer::end_tag('div')
             . \html_writer::start_tag('div', array('class' => 'main_container_studtimetable'))
@@ -204,7 +208,7 @@ class Timetable
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-start",
-            'value' => "{$this->getDate()}",
+            'value' => ($this->dateMin)? $this->getDate($this->dateMin, true): $this->getDate(),
             'min' => "{$this->getDate()}",
             'max' => "{$this->getDate($maxDate, true)}"
         ));
@@ -216,7 +220,7 @@ class Timetable
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-end",
-            'value' => "{$this->getDate($maxDate, true)}",
+            'value' => ($this->dateMax)? $this->getDate($this->dateMax, true) : $this->getDate($maxDate, true),
             'min' => "{$this->getDate()}",
             'max' => "{$this->getDate($maxDate, true)}"
         ));
