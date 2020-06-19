@@ -13,6 +13,7 @@ $CFG->dbpass = 1234;
 $CFG->prefix = 'mdl_';
 $CFG->dboptions = array(
     'dbpersist' => 0,
+
     'dbport' => '',
     'dbsocket' => '',
     'dbcollation' => 'utf8mb4_unicode_ci',

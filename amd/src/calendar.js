@@ -40,10 +40,17 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate, curMinAndMaxDate) {
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate) {
+            let dbMaxDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_min");
+            let dbMinDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_max");
+
+            if (dbMaxDate && dbMinDate) {
+                setValMinAndMaxDate = [dbMaxDate, dbMinDate];
+            }
+
             $.ajax({
                 type: "POST",
-                data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate, curMinAndMaxDate: curMinAndMaxDate},
+                data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate},
                 url: "ajax.php",
                 beforeSend: function () {
                     startLoading(root);
@@ -51,10 +58,6 @@ define(
                 complete: function () {
                     stopLoading(root);
                     registerEventListeners(role);
-                    if (setValMinAndMaxDate) {
-                        $(ItemSelectors.calendar.inputStart).val(setValMinAndMaxDate[0]);
-                        $(ItemSelectors.calendar.inputEnd).val(setValMinAndMaxDate[1]);
-                    }
                 },
                 success: function (data) {
                     content.empty();
@@ -71,18 +74,64 @@ define(
             });
         }
 
+        let updateUserPreference = function (type, value) {
+            let request = {
+                methodname: 'core_user_update_user_preferences',
+                args: {
+                    preferences: [
+                        {
+                            type: type,
+                            value: value
+                        }
+                    ]
+                }
+            }
+            Ajax.call([request])[0].then(function (data) {
+                console.log(data);
+            })
+                .fail(notification.exception);
+        }
+
+        let getUserPreference = function (userid, name) {
+            let request = {
+                methodname: 'core_user_get_user_preferences',
+                args: {
+                    userid: userid,
+                    name: name,
+                },
+            }
+            Ajax.call([request])[0].then(function (data) {
+                console.log(data);
+            })
+                .fail(notification.exception);
+        }
+
+        let setUserPreference = function (name, value, userid) {
+            let request = {
+                methodname: 'core_user_set_user_preferences',
+                args: {
+                    preferences: [
+                        {
+                            name: name,
+                            value: value,
+                            userid: userid
+                        }
+                    ]
+                }
+            }
+            Ajax.call([request])[0].then(function (data) {
+                console.log(data);
+            })
+                .fail(notification.exception);
+        }
+
         let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
                 let setValMinAndMaxDate = [
                     $(ItemSelectors.calendar.inputStart).val(),
                     $(ItemSelectors.calendar.inputEnd).val()
                 ];
-                let curMinAndMaxDate =
-                    [
-                        $(ItemSelectors.calendar.inputStart).attr('min'),
-                        $(ItemSelectors.calendar.inputStart).attr('max')
-                    ];
-                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), setValMinAndMaxDate, curMinAndMaxDate);
+                loadTimetable(role, $(ItemSelectors.containers.pageContent), $(ItemSelectors.containers.mainContent), setValMinAndMaxDate);
             });
         }
 

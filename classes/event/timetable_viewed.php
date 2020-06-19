@@ -3,6 +3,10 @@
 namespace local_timetable\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class timetable_viewed
+ * @package local_timetable\event
+ */
 class timetable_viewed extends \core\event\base
 {
 
@@ -17,6 +21,9 @@ class timetable_viewed extends \core\event\base
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
+    /**
+     * @return \moodle_url|null
+     */
     public function get_url()
     {
         return new \moodle_url('/local/timetable/view.php');
