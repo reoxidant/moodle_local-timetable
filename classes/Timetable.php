@@ -16,6 +16,7 @@ class Timetable
      * @var string
      */
     private $sqltext;
+    private $sqltext_max_date;
     /**
      * @var array
      */
@@ -51,26 +52,29 @@ class Timetable
     /**
      * @var timestamp
      */
-    private $dateMin;
+    private $curCalendarDateMin;
     /**
      * @var timestamp
      */
-    private $dateMax;
+    private $curCalendarDateMax;
+    private $maxDateCurrentUser;
 
     /**
      * Timetable constructor.
      * @param $mktime
      * @param $sqltext
+     * @param $sqltext_max_date
      * @param $arr_print_keys
      * @param $timeformat
      * @param string $role
-     * @param $dateMin
-     * @param $dateMax
+     * @param $curCalendarDateMin
+     * @param $curCalendarDateMax
      */
-    function __construct($mktime, $sqltext, $arr_print_keys, $timeformat, $role = 'student', $dateMin, $dateMax)
+    function __construct($mktime, $sqltext, $sqltext_max_date, $arr_print_keys, $timeformat, $role, $curCalendarDateMin, $curCalendarDateMax)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
+        $this->sqltext_max_date = $sqltext_max_date;
         $this->arr_print_keys = $arr_print_keys;
         global $USER;
         $this->user = $USER;
@@ -78,10 +82,10 @@ class Timetable
         $this->moodle_database = $DB;
         $this->timeformat = $timeformat;
         $this->current_role = $role;
-        $this->dateMin = $dateMin;
-        $this->dateMax = $dateMax;
-        if (!empty($dateMax) && !empty($dateMin)) :
-            $this->sql_param = [$dateMin, $dateMax];
+        $this->curCalendarDateMin = $curCalendarDateMin;
+        $this->curCalendarDateMax = $curCalendarDateMax;
+        if (!empty($curCalendarDateMin) && !empty($curCalendarDateMax)) :
+            $this->sql_param = [$curCalendarDateMin, $curCalendarDateMax];
         else:
             $this->sql_param = [$this->curdaystart];
         endif;
@@ -93,14 +97,27 @@ class Timetable
      */
     private function getDatabaseResult()
     {
-        if ($this->current_role == "student") {
+        switch ($this->current_role){
+            case "student":
+                array_unshift($this->sql_param, $this->user->username);
+                return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
+                break;
+            case "manager":
+                return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
+                break;
+            default:
+                $this->setCurrentUserMaxCalendarDate();
+                array_push($this->sql_param, $this->user->username);
+                return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
+        }
+/*        if ($this->current_role == "student") {
             array_unshift($this->sql_param, $this->user->username);
             return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         } else if ($this->current_role == "manager") {
             return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
         array_push($this->sql_param, $this->user->username);
-        return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
+        return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);*/
     }
 
     /**
@@ -293,16 +310,16 @@ class Timetable
      */
     private function getCalendar()
     {
-        $maxDate = intval((end($this->tableData)[0])->date);
+//        $maxCalendarDateCurrentUser = intval((end($this->tableData)[0])->date);
         $cal = \html_writer::start_tag('label', array('class' => "text-start"));
         $cal .= 'От:';
         $cal .= \html_writer::end_tag('label');
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-start",
-            'value' => ($this->dateMin) ? $this->getDate($this->dateMin, true) : $this->getDate(),
+            'value' => ($this->curCalendarDateMin) ? $this->getDate($this->curCalendarDateMin, true) : $this->getDate(),
             'min' => "{$this->getDate()}",
-            'max' => "{$this->getDate($maxDate, true)}"
+            'max' => "{$this->getDate($this->maxDateCurrentUser, true)}"
         ));
         $cal .= \html_writer::end_tag('input');
 
@@ -312,13 +329,18 @@ class Timetable
         $cal .= \html_writer::start_tag('input', array(
             'type' => "date",
             'class' => "input-end",
-            'value' => ($this->dateMax) ? $this->getDate($this->dateMax, true) : $this->getDate($maxDate, true),
+            'value' => ($this->curCalendarDateMax) ? $this->getDate($this->curCalendarDateMax, true) : $this->getDate($this->maxDateCurrentUser, true),
             'min' => "{$this->getDate()}",
-            'max' => "{$this->getDate($maxDate, true)}"
+            'max' => "{$this->getDate($this->maxDateCurrentUser, true)}"
         ));
         $cal .= \html_writer::end_tag('input');
 
         return $cal;
+    }
+
+    private function setCurrentUserMaxCalendarDate(){
+        $array = $this->moodle_database->get_records_sql($this->sqltext_max_date, [$this->curdaystart, $this->user->username]);
+        $this->maxDateCurrentUser = intval((end($array))->date);
     }
 
     /**
