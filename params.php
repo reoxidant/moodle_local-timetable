@@ -50,9 +50,9 @@ $table_params = [
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
         WHERE stt.markdelete = 0 AND stt.date >= ? AND stt.date <= ? AND u.username::varchar = ?
         ORDER BY stt.date, toc.timestart",
-        'sql_text_max_date' => "
+        'sql_text_min_date' => "
         SELECT 
-	        MAX(stt.date) as date
+	        MIN(stt.date) as date
         FROM sirius_studtimetable stt
             JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
             JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
@@ -65,9 +65,9 @@ $table_params = [
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
         WHERE stt.markdelete = 0 AND stt.date >= ? AND u.username::varchar = ?
         ",
-        'sql_text_min_date' => "
+        'sql_text_max_date' => "
         SELECT 
-	        MIN(stt.date) as date
+	        MAX(stt.date) as date
         FROM sirius_studtimetable stt
             JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
             JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
@@ -140,6 +140,36 @@ $table_params = [
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
         WHERE stt.markdelete = 0 AND stt.date >= ? AND stt.date <= ?
         ORDER BY stt.date, toc.timestart",
+        'sql_text_min_date' => "
+        SELECT 
+	        MIN(stt.date) as date
+        FROM sirius_studtimetable stt
+            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0 AND sg.username::varchar = ?
+            JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
+            JOIN sirius_groups g ON stt.groupuid = g.uid
+            JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
+            LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
+            LEFT JOIN mdl_user u ON stf.username = u.username
+            JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
+            LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
+            JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
+        WHERE stt.markdelete = 0 AND stt.date >= ?
+        ",
+        'sql_text_max_date' => "
+        SELECT 
+	        MAX(stt.date) as date
+        FROM sirius_studtimetable stt
+            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0 AND sg.username::varchar = ?
+            JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
+            JOIN sirius_groups g ON stt.groupuid = g.uid
+            JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
+            LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
+            LEFT JOIN mdl_user u ON stf.username = u.username
+            JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
+            LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
+            JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
+        WHERE stt.markdelete = 0 AND stt.date >= ?
+        ",
         'arr_print_keys' => [
             'timestart' => 'timestart',
             'discipline' => 'discipline',
@@ -199,6 +229,37 @@ $table_params = [
             JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
         WHERE stt.markdelete = 0 AND stt.date >= ? AND stt.date <= ? 
         ORDER BY stt.date, toc.timestart",
+        'sql_text_min_date' => "
+        SELECT
+		    MIN(stt.date) as date
+        FROM sirius_studtimetable stt
+            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
+            JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
+            JOIN sirius_groups g ON stt.groupuid = g.uid
+            JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
+            LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
+            LEFT JOIN mdl_user u ON stf.username = u.username
+            JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
+            LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
+            JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
+        WHERE stt.markdelete = 0 AND stt.date >= ?
+ 
+        ",
+        'sql_text_max_date' => "
+        SELECT
+		    MAX(stt.date) as date
+        FROM sirius_studtimetable stt
+            JOIN sirius_studgroups sg ON stt.groupuid = sg.groupuid AND sg.markdelete = 0
+            JOIN sirius_classrooms cr ON stt.classroomuid = cr.uid
+            JOIN sirius_groups g ON stt.groupuid = g.uid
+            JOIN sirius_eventtypes e ON stt.eventtypeuid = e.uid
+            LEFT JOIN sirius_staffs stf ON stt.teacheruid = stf.uid
+            LEFT JOIN mdl_user u ON stf.username = u.username
+            JOIN sirius_disciplines dis ON stt.disciplineuid = dis.uid
+            LEFT JOIN sirius_studdepartments sd ON stt.departmentuid = sd.uid
+            JOIN sirius_timeofclass toc ON stt.timeofclassuid = toc.uid
+        WHERE stt.markdelete = 0 AND stt.date >= ?
+        ",
         'arr_print_keys' => [
             'timestart' => 'timestart',
             'discipline' => 'discipline',

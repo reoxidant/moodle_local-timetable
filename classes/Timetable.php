@@ -115,15 +115,19 @@ class Timetable
     {
         switch ($this->current_role) {
             case "student":
+                $this->setCurrentUserMinCalendarDate([$this->user->username, $this->curdaystart]);
+                $this->setCurrentUserMaxCalendarDate([$this->user->username, $this->curdaystart]);
                 array_unshift($this->sql_param, $this->user->username);
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
                 break;
             case "manager":
+                $this->setCurrentUserMinCalendarDate([$this->curdaystart]);
+                $this->setCurrentUserMaxCalendarDate([$this->curdaystart]);
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
                 break;
             default:
-                $this->setCurrentUserMinCalendarDate();
-                $this->setCurrentUserMaxCalendarDate();
+                $this->setCurrentUserMinCalendarDate([$this->curdaystart, $this->user->username]);
+                $this->setCurrentUserMaxCalendarDate([$this->curdaystart, $this->user->username]);
                 array_push($this->sql_param, $this->user->username);
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
@@ -346,15 +350,19 @@ class Timetable
         return $cal;
     }
 
-    private function setCurrentUserMaxCalendarDate()
+    /**
+     * @param $array_params
+     * @throws \dml_exception
+     */
+    private function setCurrentUserMaxCalendarDate($array_params)
     {
-        $array = $this->moodle_database->get_records_sql($this->sqltext_max_date, [$this->curdaystart, $this->user->username]);
+        $array = $this->moodle_database->get_records_sql($this->sqltext_max_date, $array_params);
         $this->maxDateCurrentUser = intval((end($array))->date);
     }
 
-    private function setCurrentUserMinCalendarDate()
+    private function setCurrentUserMinCalendarDate($array_params)
     {
-        $array = $this->moodle_database->get_records_sql($this->sqltext_min_date, [$this->curdaystart, $this->user->username]);
+        $array = $this->moodle_database->get_records_sql($this->sqltext_min_date, $array_params);
         $this->minDateCurrentUser = intval((end($array))->date);
     }
 
