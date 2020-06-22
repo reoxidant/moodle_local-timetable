@@ -81,7 +81,7 @@ class Timetable
      * @param $sqltext_min_date
      * @param $arr_print_keys
      * @param $timeformat
-     * @param string $role
+     * @param $role
      * @param $curCalendarDateMin
      * @param $curCalendarDateMax
      */
@@ -319,7 +319,6 @@ class Timetable
      */
     private function getCalendar()
     {
-//        $maxCalendarDateCurrentUser = intval((end($this->tableData)[0])->date);
         $cal = \html_writer::start_tag('label', array('class' => "text-start"));
         $cal .= 'От:';
         $cal .= \html_writer::end_tag('label');

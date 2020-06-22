@@ -66,6 +66,7 @@ define(
                 }
             });
         }
+
         let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
                 let setValMinAndMaxDate = [

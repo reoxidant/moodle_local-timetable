@@ -6,8 +6,12 @@ require_once('classes/Timetable.php');
 
 use module\classes\Timetable;
 
-$setValMinAndMaxCalendarDate = (isset($_POST['setValMinAndMaxDate']) && !empty($_POST['setValMinAndMaxDate'])) ? $_POST['setValMinAndMaxDate'] : null;
-$curMinAndMaxCalendarDate = (isset($_POST['curMinAndMaxDate']) && !empty($_POST['curMinAndMaxDate'])) ? $_POST['curMinAndMaxDate'] : null;
+$setValMinAndMaxCalendarDate =
+    (
+        isset($_POST['setValMinAndMaxDate']) &&
+        validateInputsCalendar($_POST['setValMinAndMaxDate'])
+    ) ?
+        $_POST['setValMinAndMaxDate'] : null;
 
 list($minDateCalendar, $maxDateCalendar) = $setValMinAndMaxCalendarDate;
 
@@ -16,6 +20,20 @@ list($minDateCalendar, $maxDateCalendar) = checkPreference($minDateCalendar, $ma
 if ($minDateCalendar && $maxDateCalendar) {
     list($yN, $mN, $dN) = explode('-', $minDateCalendar);
     list($yX, $mX, $dX) = explode('-', $maxDateCalendar);
+}
+
+/**
+ * @param $array
+ * @return bool
+ */
+function validateInputsCalendar($array)
+{
+    foreach ($array as $str) {
+        if (!preg_match("/^[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}$/", $str)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
