@@ -30,7 +30,7 @@ function checkPreference($minDateCalendar, $maxDateCalendar)
     $maxDatePreferences = get_user_preferences("local_timetable_user_preferences_max");
 
     if ($minDateCalendar && $maxDateCalendar) {
-        if(strtotime($minDateCalendar) < strtotime($maxDateCalendar)){
+        if (strtotime($minDateCalendar) < strtotime($maxDateCalendar)) {
             set_user_preference("local_timetable_user_preferences_min", $minDateCalendar);
             set_user_preference("local_timetable_user_preferences_max", $maxDateCalendar);
         }
@@ -48,6 +48,7 @@ if (isset($_POST['role']) && !empty($_POST['role'])) {
     $table = (new Timetable(
         $table_params[$_POST['role']]['curdate'],
         ($minDateCalendar && $maxDateCalendar) ? $table_params[$_POST['role']]['sql_text_max_min'] : $table_params[$_POST['role']]['sql_text'],
+        $table_params[$_POST['role']]['sql_text_min_date'],
         $table_params[$_POST['role']]['sql_text_max_date'],
         $table_params[$_POST['role']]['arr_print_keys'],
         $table_params[$_POST['role']]['timeformat'],

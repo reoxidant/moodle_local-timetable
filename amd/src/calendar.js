@@ -40,14 +40,7 @@ define(
             loadingIconContainer.addClass('hidden');
         };
 
-        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate) {
-            let dbMaxDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_min");
-            let dbMinDate = getUserPreference($(ItemSelectors.calendar.wrapper).attr('userid'), "local_timetable_user_preference_max");
-
-            if (dbMaxDate && dbMinDate) {
-                setValMinAndMaxDate = [dbMaxDate, dbMinDate];
-            }
-
+        let loadTimetable = function (role, root = $(ItemSelectors.containers.pageContent), content, setValMinAndMaxDate = null) {
             $.ajax({
                 type: "POST",
                 data: {role: role, setValMinAndMaxDate: setValMinAndMaxDate},
@@ -57,11 +50,11 @@ define(
                 },
                 complete: function () {
                     stopLoading(root);
-                    registerEventListeners(role);
                 },
                 success: function (data) {
                     content.empty();
                     content.append(data);
+                    registerEventListeners(role);
                 },
                 dataType: "html",
                 cache: "false",
@@ -73,58 +66,6 @@ define(
                 }
             });
         }
-
-        let updateUserPreference = function (type, value) {
-            let request = {
-                methodname: 'core_user_update_user_preferences',
-                args: {
-                    preferences: [
-                        {
-                            type: type,
-                            value: value
-                        }
-                    ]
-                }
-            }
-            Ajax.call([request])[0].then(function (data) {
-                console.log(data);
-            })
-                .fail(notification.exception);
-        }
-
-        let getUserPreference = function (userid, name) {
-            let request = {
-                methodname: 'core_user_get_user_preferences',
-                args: {
-                    userid: userid,
-                    name: name,
-                },
-            }
-            Ajax.call([request])[0].then(function (data) {
-                console.log(data);
-            })
-                .fail(notification.exception);
-        }
-
-        let setUserPreference = function (name, value, userid) {
-            let request = {
-                methodname: 'core_user_set_user_preferences',
-                args: {
-                    preferences: [
-                        {
-                            name: name,
-                            value: value,
-                            userid: userid
-                        }
-                    ]
-                }
-            }
-            Ajax.call([request])[0].then(function (data) {
-                console.log(data);
-            })
-                .fail(notification.exception);
-        }
-
         let registerEventListeners = function (role) {
             $(ItemSelectors.containers.calendar).change(function (e) {
                 let setValMinAndMaxDate = [

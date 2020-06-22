@@ -16,7 +16,14 @@ class Timetable
      * @var string
      */
     private $sqltext;
+    /**
+     * @var string
+     */
     private $sqltext_max_date;
+    /**
+     * @var string
+     */
+    private $sqltext_min_date;
     /**
      * @var array
      */
@@ -57,24 +64,33 @@ class Timetable
      * @var timestamp
      */
     private $curCalendarDateMax;
+    /**
+     * @var timestamp
+     */
     private $maxDateCurrentUser;
+    /**
+     * @var timestamp
+     */
+    private $minDateCurrentUser;
 
     /**
      * Timetable constructor.
      * @param $mktime
      * @param $sqltext
      * @param $sqltext_max_date
+     * @param $sqltext_min_date
      * @param $arr_print_keys
      * @param $timeformat
      * @param string $role
      * @param $curCalendarDateMin
      * @param $curCalendarDateMax
      */
-    function __construct($mktime, $sqltext, $sqltext_max_date, $arr_print_keys, $timeformat, $role, $curCalendarDateMin, $curCalendarDateMax)
+    function __construct($mktime, $sqltext, $sqltext_min_date, $sqltext_max_date, $arr_print_keys, $timeformat, $role, $curCalendarDateMin, $curCalendarDateMax)
     {
         $this->curdaystart = $mktime;
         $this->sqltext = $sqltext;
         $this->sqltext_max_date = $sqltext_max_date;
+        $this->sqltext_min_date = $sqltext_min_date;
         $this->arr_print_keys = $arr_print_keys;
         global $USER;
         $this->user = $USER;
@@ -97,7 +113,7 @@ class Timetable
      */
     private function getDatabaseResult()
     {
-        switch ($this->current_role){
+        switch ($this->current_role) {
             case "student":
                 array_unshift($this->sql_param, $this->user->username);
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
@@ -106,18 +122,11 @@ class Timetable
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
                 break;
             default:
+                $this->setCurrentUserMinCalendarDate();
                 $this->setCurrentUserMaxCalendarDate();
                 array_push($this->sql_param, $this->user->username);
                 return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
         }
-/*        if ($this->current_role == "student") {
-            array_unshift($this->sql_param, $this->user->username);
-            return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
-        } else if ($this->current_role == "manager") {
-            return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);
-        }
-        array_push($this->sql_param, $this->user->username);
-        return $this->moodle_database->get_records_sql($this->sqltext, $this->sql_param);*/
     }
 
     /**
@@ -160,7 +169,7 @@ class Timetable
     }
 
     /**
-     * @param $this->tableHtml
+     * @param $this ->tableHtml
      * @set $this->tableHtml table html elements
      */
     private function setTableHtml()
@@ -338,9 +347,16 @@ class Timetable
         return $cal;
     }
 
-    private function setCurrentUserMaxCalendarDate(){
+    private function setCurrentUserMaxCalendarDate()
+    {
         $array = $this->moodle_database->get_records_sql($this->sqltext_max_date, [$this->curdaystart, $this->user->username]);
         $this->maxDateCurrentUser = intval((end($array))->date);
+    }
+
+    private function setCurrentUserMinCalendarDate()
+    {
+        $array = $this->moodle_database->get_records_sql($this->sqltext_min_date, [$this->curdaystart, $this->user->username]);
+        $this->minDateCurrentUser = intval((end($array))->date);
     }
 
     /**
@@ -356,7 +372,7 @@ class Timetable
         } else if ($time && $isTimestamp && !$constDate) {
             $date = date("Y-m-d", $time);
         } else {
-            $date = date("Y-m-d", $this->curdaystart);
+            $date = date("Y-m-d", $this->minDateCurrentUser);
         }
         return $date;
     }

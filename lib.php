@@ -36,20 +36,3 @@ function local_timetable_user_preferences_max()
 
     return $preferences;
 }
-
-
-/**
- * @return array
- */
-function local_timetable_user_preferences_calendar_max_date()
-{
-    $preferences = array();
-    $preferences['local_timetable_user_preferences_calendar_max_date'] = array(
-        'type' => PARAM_INT,
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 0,
-        'choices' => array($_POST['setValMinAndMaxDate'][1]),
-    );
-
-    return $preferences;
-}
